@@ -15,6 +15,7 @@ import csv
 import shutil
 from HelperFunctions import timer
 import time
+import webbrowser
 
 # Global variables instance
 selected_csv = ""
@@ -128,6 +129,7 @@ root.resizable(False, False)
 
 # Creating widgets
 content = ttk.Frame(root, padding=10)
+
 summary = ttk.Label(content, text="This tool allows you to rename photos from fulcrum using a CSV file.\n" +
                                   "Please enter the fulcrum asset CSV, the folder where the photos are located,\n" +
                                   "and the folder where you want the renamed photos to be copied")
@@ -141,6 +143,7 @@ dest_button = ttk.Button(content, text="Select Destination Directory", command=g
 run = ttk.Button(content, text="Rename Photos", command=run_script)
 progress_bar = ttk.Progressbar(content, orient="horizontal", mode="determinate", length=300)
 progress_label = ttk.Label(content, text="")
+help_button = ttk.Button(content, text="Help", command=lambda:webbrowser.open("https://github.com/nicosaboonchi/PhotoRename"))
 
 # placement of gui and widgets
 content.grid(column=0, row=0)
@@ -151,7 +154,8 @@ dest_label.grid(column=0, row=3, sticky="w", padx=5, pady=10)
 csv_button.grid(column=1, row=1, sticky="e", padx=5, pady=10)
 source_button.grid(column=1, row=2, sticky="e", padx=5, pady=10)
 dest_button.grid(column=1, sticky="e", padx=5, pady=10, row=3)
-run.grid(column=0, row=4, sticky="w", padx=5, pady=10)
+run.grid(column=1, row=4, sticky="e", padx=5, pady=10)
+help_button.grid(column=0, row=4, sticky="w", padx=5, pady=10)
 
 root.mainloop()
 
