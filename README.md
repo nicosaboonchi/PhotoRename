@@ -3,7 +3,7 @@
 ## How to use
 1. Download a csv file from fulcrum making sure the _include photos_ check box is checked.
 2. Unzip the folder
-3. You can place the folder on your local machine or on a network drive. The reanmer will run much faster on a local machine.
+3. You can place the folder on your local machine or on a network drive. The reanmer will run much faster on the local machine than a network drive.
 4. Open the photo renamer app
 5. Click _Select CSV_ this will open up your documents folder. If the fulcrum folder is not in your documents then you will have to navigate to find it. The correct csv file will be the name of the Fulcrum app and not have photo or photos in the name.
 6. Verify the CSV you selected is correct.
