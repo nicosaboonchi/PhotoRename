@@ -5,7 +5,7 @@ This app helps the Facilities Management team easily rename photos captured usin
 ## How to Use
 
 1. **Download the CSV File**  
-   From Fulcrum, download the CSV file, ensuring the "Include Photos" checkbox is checked.
+   From Fulcrum, download the CSV file, ensuring the "Include Photos" checkbox is checked. This will download the photos and 3 CSV files.
 
 2. **Unzip the Folder**  
    Unzip the folder that contains the photos and CSV file.
