@@ -65,32 +65,41 @@ def run_script():
         messagebox.showerror(message="Please select CSV file, source directory, and destination directory.")
         return
 
+    # hide the run button and help button and show the progress bar
     run.grid_forget()
     help_button.grid_forget()
     progress_bar.grid(column=0, row=4, sticky=(W, E), padx=5, pady=10, columnspan=2)
     progress_label.grid(column=0, row=5, padx=5, pady=10, columnspan=2)
 
+    # get the total number of photos for the progress bar
     total_photos = get_total_photos(selected_csv)
     progress_bar["maximum"] = total_photos
 
     time_start = time.time()
 
+    # open the csv and read each line from the csv
     with open(selected_csv, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
 
         processed_photos = 0
+
+        # store the barcode and photos for each row
         for row in reader:
             barcode = row["barcode"]
             photos = row["photos"].split(",")
 
+            # store the original path and creates new file names and path
             for idx, img in enumerate(photos):
                 org_file_path = os.path.join(selected_source, img+".jpg")
                 new_file_name = f"{barcode} - {idx+1}.jpg"
                 dest_file_path = os.path.join(selected_dest, new_file_name)
 
+                # check if the new file name already exists
                 if os.path.exists(dest_file_path):
                     print(f"{new_file_name} already exists, skipping file")
                     pass
+
+                # using shutil to copy the img to the new path
                 else:
                     try:
                         shutil.copy(org_file_path, dest_file_path)
@@ -98,6 +107,7 @@ def run_script():
                     except FileNotFoundError:
                         print(f"{img} file not found")
 
+                # update the progress bar
                 processed_photos += 1
                 progress_bar["value"] = processed_photos
                 update_label(processed_photos, total_photos)
