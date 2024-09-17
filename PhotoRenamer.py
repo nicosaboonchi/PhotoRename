@@ -61,8 +61,30 @@ def update_label(processed_rows, total_rows):
 
 # checks to make sure all variables are satisfied then runs renaming
 def run_script():
+    global cancel_requested
+    cancel_requested = False  # Reset the cancel flag when starting the process
+
     if not (selected_csv and selected_source and selected_dest):
         messagebox.showerror(message="Please select CSV file, source directory, and destination directory.")
+        return
+
+        # Read the CSV and check for required columns
+    try:
+        with open(selected_csv, newline="") as csvfile:
+            reader = csv.DictReader(csvfile)
+            if 'barcode' not in reader.fieldnames or 'photos' not in reader.fieldnames:
+                messagebox.showerror(message="CSV file must contain 'barcode' and 'photos' columns.")
+                return
+    except Exception as e:
+        messagebox.showerror(message=f"Error reading CSV file: {e}")
+        return
+
+        # Check if source and destination directories are valid
+    if not os.path.isdir(selected_source):
+        messagebox.showerror(message="Source directory does not exist.")
+        return
+    if not os.path.isdir(selected_dest):
+        messagebox.showerror(message="Destination directory does not exist.")
         return
 
     # hide the run button and help button and show the progress bar
@@ -82,6 +104,7 @@ def run_script():
         reader = csv.DictReader(csvfile)
 
         processed_photos = 0
+        errors = []
 
         # store the barcode and photos for each row
         for row in reader:
@@ -100,12 +123,15 @@ def run_script():
                     pass
 
                 # using shutil to copy the img to the new path
-                else:
-                    try:
-                        shutil.copy(org_file_path, dest_file_path)
-                        print(f"Successfully renamed {img} to {new_file_name}")
-                    except FileNotFoundError:
-                        print(f"{img} file not found")
+                try:
+                    shutil.copy(org_file_path, dest_file_path)
+                    print(f"Successfully renamed {img} to {new_file_name}")
+                except FileNotFoundError:
+                    print(f"{img} file not found")
+                    errors.append(f"{img} file not found")
+                except Exception as e:
+                    print(f"Error copying {img}: {e}")
+                    errors.append(f"Error copying {img}: {e}")
 
                 # update the progress bar
                 processed_photos += 1
@@ -116,7 +142,12 @@ def run_script():
     time_end = time.time()
     total_time = time_end - time_start
 
-    messagebox.showinfo(message=f"Photos have been renamed in {total_time:.2f} seconds" )
+    # Display any errors encountered
+    if errors:
+        error_log = "\n".join(errors)
+        messagebox.showwarning(message=f"Some files encountered issues:\n{error_log}")
+
+    messagebox.showinfo(message=f"Photos have been renamed in {total_time:.2f} seconds")
 
     root.destroy()
 
