@@ -46,7 +46,7 @@ def getDestPath():
         global selected_dest
         selected_dest = dest_path
 
-
+# calculates total number of photos in the file to use for progress bar
 def get_total_photos(csv_file):
     total_photos = 0
     with open(csv_file, newline="") as csvfile:
@@ -61,14 +61,11 @@ def update_label(processed_rows, total_rows):
 
 # checks to make sure all variables are satisfied then runs renaming
 def run_script():
-    global cancel_requested
-    cancel_requested = False  # Reset the cancel flag when starting the process
-
     if not (selected_csv and selected_source and selected_dest):
         messagebox.showerror(message="Please select CSV file, source directory, and destination directory.")
         return
 
-        # Read the CSV and check for required columns
+    # Read the CSV and check for required columns
     try:
         with open(selected_csv, newline="") as csvfile:
             reader = csv.DictReader(csvfile)
@@ -79,7 +76,7 @@ def run_script():
         messagebox.showerror(message=f"Error reading CSV file: {e}")
         return
 
-        # Check if source and destination directories are valid
+    # Check if source and destination directories are valid
     if not os.path.isdir(selected_source):
         messagebox.showerror(message="Source directory does not exist.")
         return
@@ -135,9 +132,10 @@ def run_script():
 
                 # update the progress bar
                 processed_photos += 1
-                progress_bar["value"] = processed_photos
-                update_label(processed_photos, total_photos)
-                root.update_idletasks()
+                if processed_photos % 50 == 0:
+                    progress_bar["value"] = processed_photos
+                    update_label(processed_photos, total_photos)
+                    root.update_idletasks()
 
     time_end = time.time()
     total_time = time_end - time_start
