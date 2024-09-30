@@ -9,6 +9,7 @@ from tkinter import filedialog, messagebox, ttk
 
 class PhotoRenameApp:
     def __init__(self, root):
+        # Global variables and basic properties of the GUI
         self.root = root
         self.root.title("Photo Rename App")
         self.root.eval("tk::PlaceWindow . center")
@@ -22,6 +23,7 @@ class PhotoRenameApp:
         self.gui_setup()
 
     def gui_setup(self):
+        """Creates high level framing for the GUI interface where widgets will be placed"""
         notebook = ttk.Notebook(self.root)
         notebook.grid(column=0, row=0)
 
@@ -36,6 +38,8 @@ class PhotoRenameApp:
         self.create_fm_widgets()
 
     def create_fm_widgets(self):
+        """Creates the widgets for the FM tab"""
+
         summary = ttk.Label(self.fm_tab, text="Welcome to the FM photo renamer. This app renames photos from Fulcrum using\n"+
                                  "the barcode column from a Fulcrum CSV.\n\n" +
                                  "Please select a Fulcrum CSV, the source directory where the photos are stored,\n"+
@@ -50,9 +54,15 @@ class PhotoRenameApp:
         self.fm_source_label.grid(column=0, row=2, sticky="w", padx=5, pady=10)
         self.fm_dest_label.grid(column=0, row=3, sticky="w", padx=5, pady=10)
 
-        self.fm_csv_button = ttk.Button(self.fm_tab, text="Select CSV", command=lambda: self.get_csv(self.fm_csv_label))
-        self.fm_source_button = ttk.Button(self.fm_tab, text="Select Source Destination", command=lambda:self.get_source_dir(self.fm_source_label))
-        self.fm_dest_button = ttk.Button(self.fm_tab, text="Select Destination Directory", command=lambda: self.get_destination_dir(self.fm_dest_label))
+        self.fm_csv_button = ttk.Button(self.fm_tab, text="Select CSV",
+                                        command=lambda: self.get_csv(self.fm_csv_label, "FM"))
+
+        self.fm_source_button = ttk.Button(self.fm_tab, text="Select Source Destination",
+                                           command=lambda:self.get_source_dir(self.fm_source_label))
+
+        self.fm_dest_button = ttk.Button(self.fm_tab, text="Select Destination Directory",
+                                         command=lambda: self.get_destination_dir(self.fm_dest_label))
+
         self.fm_csv_button.grid(column=1, row=1, sticky="e", padx=5, pady=10)
         self.fm_source_button.grid(column=1, row=2, sticky="e", padx=5, pady=10)
         self.fm_dest_button.grid(column=1, row=3, sticky="e", padx=5, pady=10)
@@ -65,8 +75,11 @@ class PhotoRenameApp:
         self.fm_help_button.grid(column=0, row=4, sticky="w", padx=5, pady=10)
 
     def create_eas_widgets(self):
-        summary = ttk.Label(self.eas_tab, text="Welcome to the EAS Photo Renamer...THis is for the county of san diego\n"
-                                               +"to rename photos that is generated from access csv file")
+        """Creates the widgets for the EAS tab"""
+
+        summary = ttk.Label(self.eas_tab, text="Welcome to the EAS Photo Renamer. This tab is used for renaming San Diego County\n"+
+                                               "assets.\n\nPlease use the CSV file from Access and add a source_path" +
+                                               "column with the path\nto the photos.")
         summary.grid(column=0, row=0, columnspan=2, padx=5, pady=10, sticky="w")
 
         self.eas_csv_label = ttk.Label(self.eas_tab, text="Open CSV File")
@@ -74,39 +87,52 @@ class PhotoRenameApp:
         self.eas_csv_label.grid(column=0, row=1, sticky="w", padx=5, pady=10)
         self.eas_dest_label.grid(column=0, row=2, sticky="w", padx=5, pady=10)
 
-        self.eas_csv_button = ttk.Button(self.eas_tab, text="Select CSV", command=lambda: self.get_csv(self.eas_csv_label))
-        self.eas_dest_button = ttk.Button(self.eas_tab, text="Select Destination Directory", command=lambda: self.get_destination_dir(self.eas_dest_label))
+        self.eas_csv_button = ttk.Button(self.eas_tab, text="Select CSV",
+                                         command=lambda: self.get_csv(self.eas_csv_label, "EAS"))
+        self.eas_dest_button = ttk.Button(self.eas_tab, text="Select Destination Directory",
+                                          command=lambda: self.get_destination_dir(self.eas_dest_label))
         self.eas_csv_button.grid(column=1, row=1, sticky="e", padx=5, pady=10)
         self.eas_dest_button.grid(column=1, row=2, sticky="e", padx=5, pady=10)
 
         self.eas_run_button = ttk.Button(self.eas_tab, text="Rename Photos", command=self.run_eas_rename)
         self.eas_run_button.grid(column=1, row=4, sticky="e", padx=5, pady=10)
 
-    def get_csv(self, label):
+        self.eas_help_button = ttk.Button(self.eas_tab, text="Help",
+                                          command=lambda: webbrowser.open("https://github.com/nicosaboonchi/PhotoRename"))
+        self.eas_help_button.grid(column=0, row=4, sticky="w", padx=5, pady=10)
+
+    def get_csv(self, label, context):
+        """Sets the global variable and gets the total number of photos in the CSV
+        a context variable is passed since the EAS and FM CSVs are different."""
         self.selected_csv = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")],
                                                           initialdir=os.path.expanduser("~/Documents"))
         if self.selected_csv:
             label.config(text=f"{os.path.basename(self.selected_csv)}")
-            self.total_photos = self.get_num_photos()
+            self.total_photos = self.get_num_photos(context)
             print(f"total photos: {self.total_photos}")
 
     def get_source_dir(self, label):
+        """Used for the source dir button. Asks for folder from user and sets to global"""
         self.selected_source_dir = filedialog.askdirectory(initialdir=os.path.expanduser("~/Documents"))
         if self.selected_source_dir:
             label.config(text=f"{self.selected_source_dir}")
 
     def get_destination_dir(self, label):
+        """Used for the dest button. Asks for folder from user and sets to global"""
         self.selected_dest_dir = filedialog.askdirectory(initialdir=os.path.expanduser("~/Documents"))
         if self.selected_dest_dir:
             label.config(text=f"{self.selected_dest_dir}")
 
     def run_fm_rename(self):
-
+        """Renaming photo logic for FM. Requires a CSV file with a column named barcode and photos.
+        Fulcrum export should already contain these columns."""
         processed_photos = 0
 
+        # hide the buttons when ran
         self.fm_run_button.grid_forget()
         self.fm_help_button.grid_forget()
 
+        # Create progress bar
         progress_bar = ttk.Progressbar(self.fm_tab, orient="horizontal", mode="determinate", length=300,
                                        maximum=self.total_photos)
         progress_label = ttk.Label(self.fm_tab, text=f"Processed {processed_photos} / {self.total_photos}")
@@ -119,10 +145,12 @@ class PhotoRenameApp:
             with open(self.selected_csv, newline="") as csvfile:
                 reader = DictReader(csvfile)
 
+                # store each row barcode and photos
                 for row in reader:
                     barcode = row["barcode"]
-                    photos = row["photos"].split(",")
+                    photos = row["photos"].split(",") # photos are separated my commas
 
+                    # creates index for each photo and creates the new names and paths
                     for idx, img in enumerate(photos):
                         org_photo = os.path.join(self.selected_source_dir, img + ".jpg")
                         new_photo_name = f"{barcode} - {idx + 1}.jpg"
@@ -130,7 +158,6 @@ class PhotoRenameApp:
 
                         if os.path.exists(new_photo_dest):
                             pass
-
                         try:
                             shutil.copy(org_photo, new_photo_dest)
                         except FileNotFoundError:
@@ -138,6 +165,7 @@ class PhotoRenameApp:
                         except Exception as error:
                             print(f"Error copying {img}: {error}")
 
+                        # progress bar updates every 25 photos
                         processed_photos += 1
                         if processed_photos % 25 == 0:
                             progress_bar["value"] = processed_photos
@@ -156,10 +184,15 @@ class PhotoRenameApp:
         root.destroy()
 
     def run_eas_rename(self):
+        """Renaming logic for EAS. CSV requires columns: source_path, org_name, new_name, folder.
+        CSV can be created from the Access database but a source_path will still need to be provided."""
         processed_photos = 0
 
+        # hide the run and help buttons
         self.eas_run_button.grid_forget()
+        self.eas_help_button.grid_forget()
 
+        # create and show progress bar
         progress_bar = ttk.Progressbar(self.eas_tab, orient="horizontal", mode="determinate", length=300,
                                        maximum=self.total_photos)
         progress_label = ttk.Label(self.eas_tab, text=f"Processed {processed_photos} / {self.total_photos}")
@@ -170,12 +203,15 @@ class PhotoRenameApp:
 
         with open(self.selected_csv, newline="") as csvfile:
             reader = DictReader(csvfile)
+
+            # iterate each row storing the info
             for row in reader:
                 source_path = row["source_path"]
                 org_name = row["org_name"]
                 new_name = row["new_name"]
                 folder = row["folder"]
 
+                # creates new paths
                 org_path = os.path.join(source_path, org_name)
                 folder_dir = os.path.join(self.selected_dest_dir, folder)
                 new_img_path = os.path.join(folder_dir, new_name)
@@ -195,6 +231,7 @@ class PhotoRenameApp:
                     except Exception as error:
                         print(f"Error copying {org_name}: {error}")
 
+                    # update progress bar every 25 photos
                     processed_photos += 1
                     if processed_photos % 25 == 0:
                         progress_bar["value"] = processed_photos
@@ -208,17 +245,19 @@ class PhotoRenameApp:
 
         root.destroy()
 
-    def get_num_photos(self):
+    def get_num_photos(self, context):
+        """When CSV is selected it will get the number of photos in the CSV depending on
+        which CSV is provided."""
         total_photos = 0
         with open(self.selected_csv, newline="") as csvfile:
             reader = csv.DictReader(csvfile)
 
-            if "photos" in reader.fieldnames:
+            if context == "FM":
                 for row in reader:
                     photos = row["photos"].split(",")
                     total_photos += len(photos)
 
-            elif "new_name" in reader.fieldnames:
+            elif context == "EAS":
                 for row in reader:
                     total_photos += 1
 
