@@ -19,6 +19,7 @@ class PhotoRenameApp:
         self.selected_source_dir = ""
         self.selected_dest_dir = ""
         self.total_photos = 0
+        self.errors = []
 
         self.gui_setup()
 
@@ -109,7 +110,6 @@ class PhotoRenameApp:
         if self.selected_csv:
             label.config(text=f"{os.path.basename(self.selected_csv)}")
             self.total_photos = self.get_num_photos(context)
-            print(f"total photos: {self.total_photos}")
 
     def get_source_dir(self, label):
         """Used for the source dir button. Asks for folder from user and sets to global"""
@@ -126,6 +126,10 @@ class PhotoRenameApp:
     def run_fm_rename(self):
         """Renaming photo logic for FM. Requires a CSV file with a column named barcode and photos.
         Fulcrum export should already contain these columns."""
+        if not (self.selected_csv and self.selected_source_dir and self.selected_dest_dir):
+            messagebox.showerror(message="Please select valid CSV file, source directory, and destination directory")
+            return
+
         processed_photos = 0
 
         # hide the buttons when ran
@@ -157,20 +161,21 @@ class PhotoRenameApp:
                         new_photo_dest = os.path.join(self.selected_dest_dir, new_photo_name)
 
                         if os.path.exists(new_photo_dest):
-                            pass
+                            self.errors.append(f"{new_photo_name} already exists skipping")
+                            continue
                         try:
                             shutil.copy(org_photo, new_photo_dest)
                         except FileNotFoundError:
-                            print(f"{img} not found")
+                            self.errors.append(f"{img} not found in source directory")
                         except Exception as error:
-                            print(f"Error copying {img}: {error}")
+                            self.errors.append(f"Error copying {img}: {error}")
 
                         # progress bar updates every 25 photos
                         processed_photos += 1
-                        if processed_photos % 25 == 0:
+                        if (processed_photos % 25 == 0) or (processed_photos % self.total_photos == 0):
                             progress_bar["value"] = processed_photos
                             progress_label.config(text=f"Processed {processed_photos} / {self.total_photos}")
-                            root.update_idletasks()
+                            self.root.update()
 
         except Exception as error:
             messagebox.showerror(message=f"Error reading CSV file: {error}")
@@ -179,13 +184,23 @@ class PhotoRenameApp:
         time_end = time.time()
         total_time = time_end - time_start
 
-        messagebox.showinfo(message=f"Photos have been renamed in {total_time:.2f} seconds")
+        if self.errors:
+            with open(f"{self.selected_source_dir}/errors.txt", "w") as errorfile:
+                for err in self.errors:
+                    errorfile.write(f"{time.asctime()}\t{err}\n")
 
-        root.destroy()
+        messagebox.showinfo(message=f"Photos have been renamed with {len(self.errors)} errors\n"
+                                    f" in {total_time:.2f} seconds, please check error file for any errors")
+
+        self.root.destroy()
 
     def run_eas_rename(self):
         """Renaming logic for EAS. CSV requires columns: source_path, org_name, new_name, folder.
         CSV can be created from the Access database but a source_path will still need to be provided."""
+        if not (self.selected_csv and self.selected_dest_dir):
+            messagebox.showerror(message="Please select valid CSV file and destination directory")
+            return
+
         processed_photos = 0
 
         # hide the run and help buttons
@@ -253,16 +268,25 @@ class PhotoRenameApp:
             reader = csv.DictReader(csvfile)
 
             if context == "FM":
+                required_fields = {"photos", "barcode"}
+                if not required_fields.issubset(reader.fieldnames):
+                    messagebox.showerror(message="CSV does not contain either 'photos' or 'barcode' column")
+                    return
+
                 for row in reader:
                     photos = row["photos"].split(",")
                     total_photos += len(photos)
 
             elif context == "EAS":
+                required_fields = {"source_path", "org_name", "new_name", "folder"}
+                if  not required_fields.issubset(reader.fieldnames):
+                    messagebox.showerror(message="CSV missing 'source_path', 'org_name', 'new_name', 'folder'")
+                    return
+
                 for row in reader:
                     total_photos += 1
 
         return total_photos
-
 
 if __name__ == "__main__":
     root = Tk()
