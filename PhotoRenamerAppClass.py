@@ -41,11 +41,15 @@ class PhotoRenameApp:
     def create_fm_widgets(self):
         """Creates the widgets for the FM tab"""
 
-        summary = ttk.Label(self.fm_tab, text="Welcome to the FM photo renamer. This app renames photos from Fulcrum using\n"+
-                                 "the barcode column from a Fulcrum CSV.\n\n" +
-                                 "Please select a Fulcrum CSV, the source directory where the photos are stored,\n"+
-                                 "and the destination directory where you want the photos to be copied to.\n\n" +
-                                 "Press the help button for more information and instructions.")
+        summary = ttk.Label(self.fm_tab,
+                            text="Welcome to the FM photo renamer. This app renames photos from Fulcrum using"
+                                 "the barcode column from a Fulcrum CSV.\n\n"
+                                 "Please select a Fulcrum CSV, the source directory where the photos are stored,"
+                                 "and the destination directory where you want the photos to be copied to.\n\n"
+                                 "Press the help button for more information and instructions.",
+                            wraplength=400,
+                            width=70)
+
         summary.grid(column=0, row=0, columnspan=2, padx=5, pady=10, sticky="w")
 
         self.fm_csv_label = ttk.Label(self.fm_tab, text="Open CSV File")
@@ -78,9 +82,14 @@ class PhotoRenameApp:
     def create_eas_widgets(self):
         """Creates the widgets for the EAS tab"""
 
-        summary = ttk.Label(self.eas_tab, text="Welcome to the EAS Photo Renamer. This tab is used for renaming San Diego County\n"+
-                                               "assets.\n\nPlease use the CSV file from Access and add a source_path" +
-                                               "column with the path\nto the photos.")
+        summary = ttk.Label(self.eas_tab,
+                            text="Welcome to the EAS Photo Renamer. This tab is used for renaming San Diego County assets.\n\n"
+                                 "Generate a CSV file from Access and add a `source_path` column to the CSV file.\n\n"
+                                 "Please select the CSV file and a destination directory where the renamed photos will be stored.\n\n"
+                                 "Press the help button for a more detailed walkthrough, error help, and video demo.",
+                            wraplength=400,
+                            width=70)
+
         summary.grid(column=0, row=0, columnspan=2, padx=5, pady=10, sticky="w")
 
         self.eas_csv_label = ttk.Label(self.eas_tab, text="Open CSV File")
@@ -283,7 +292,7 @@ class PhotoRenameApp:
                     messagebox.showerror(message="CSV missing 'source_path', 'org_name', 'new_name', 'folder'")
                     return
 
-                for row in reader:
+                for _ in reader:
                     total_photos += 1
 
         return total_photos
