@@ -1,6 +1,6 @@
 # **Photo Renamer App**
 
-This app renames photos using information from a CSV file. It simplifies the process of renaming photos based on barcodes and ensures that each image follows the format: `barcode_1.jpg`, `barcode_2.jpg`, and so on.
+This app renames photos using information from a CSV file. It simplifies the process of renaming photos based on barcodes and ensures that each image follows the format: `barcode - 1.jpg`, `barcode - 2.jpg`, and so on.
 
 ## **Getting Started with Facilities Management** 🚀
 
