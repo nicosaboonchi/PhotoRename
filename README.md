@@ -1,6 +1,6 @@
 # **Photo Renamer App**
 
-This app renames photos using information from a CSV file. It simplifies the process of renaming photos based on barcodes and ensures that each image follows the format: `barcode_1.jpg`, `barcode_2.jpg`, and so on.
+This app renames photos using information from a CSV file. It simplifies the process of renaming photos based on barcodes and ensures that each image follows the format: `barcode - 1.jpg`, `barcode - 2.jpg`, and so on.
 
 ## **Getting Started with Facilities Management** 🚀
 
@@ -61,8 +61,8 @@ This app renames photos using information from a CSV file. It simplifies the pro
 - **Missing `photos` or `barcode` column**:  
   The CSV file is missing one or both of the required columns. Ensure you’ve selected the correct CSV file.
   
-- **Photo name already exists**:  
-  A photo with the same name already exists in the destination folder. Since two files can’t have identical names, the photo is skipped.
+- **Photo name already exists**:
+  A photo with the same name already exists in the destination folder. **This can be a big problem** since that can imply two different assets have the same barcode number. 
   
 - **Image not found in source directory**:  
   The script couldn't locate the original photo in the source folder. This may occur if a photo was deleted, moved, or never existed for the asset in question.
