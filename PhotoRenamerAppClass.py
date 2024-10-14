@@ -15,7 +15,7 @@ class PhotoRenameApp(tkinter.Tk):
         self.call("source", "azure.tcl")
         self.call("set_theme", "dark")
 
-        self.iconbitmap(r"C:\Users\nico.saboo\Documents\Python\PhotoRename\construction-industry-helmet-protection_108590.ico")
+        self.iconbitmap(r"construction-industry-helmet-protection_108590.ico")
         self.title("Photo Rename App")
         self.eval("tk::PlaceWindow . center")
         self.resizable(False, False)
