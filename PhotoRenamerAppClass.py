@@ -2,18 +2,23 @@ import os
 import csv
 import shutil
 import time
+import tkinter
 import webbrowser
 from csv import DictReader
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 
-class PhotoRenameApp:
-    def __init__(self, root):
+class PhotoRenameApp(tkinter.Tk):
+    def __init__(self):
+        super().__init__()
         # Global variables and basic properties of the GUI
-        self.root = root
-        self.root.title("Photo Rename App")
-        self.root.eval("tk::PlaceWindow . center")
-        self.root.resizable(False, False)
+        self.call("source", "azure.tcl")
+        self.call("set_theme", "dark")
+
+        self.iconbitmap(r"C:\Users\nico.saboo\Documents\Python\PhotoRename\construction-industry-helmet-protection_108590.ico")
+        self.title("Photo Rename App")
+        self.eval("tk::PlaceWindow . center")
+        self.resizable(False, False)
 
         self.selected_csv = ""
         self.selected_source_dir = ""
@@ -25,7 +30,7 @@ class PhotoRenameApp:
 
     def gui_setup(self):
         """Creates high level framing for the GUI interface where widgets will be placed"""
-        notebook = ttk.Notebook(self.root)
+        notebook = ttk.Notebook(self)
         notebook.grid(column=0, row=0)
 
         # create tabs
@@ -184,7 +189,7 @@ class PhotoRenameApp:
                         if (processed_photos % 25 == 0) or (processed_photos % self.total_photos == 0):
                             progress_bar["value"] = processed_photos
                             progress_label.config(text=f"Processed {processed_photos} / {self.total_photos}")
-                            self.root.update()
+                            self.update()
 
         except Exception as error:
             messagebox.showerror(message=f"Error reading CSV file: {error}")
@@ -201,7 +206,7 @@ class PhotoRenameApp:
         messagebox.showinfo(message=f"Photos have been renamed with {len(self.errors)} errors\n"
                                     f" in {total_time:.2f} seconds, please check error file for any errors")
 
-        self.root.destroy()
+        self.destroy()
 
     def run_eas_rename(self):
         """Renaming logic for EAS. CSV requires columns: source_path, org_name, new_name, folder.
@@ -260,14 +265,14 @@ class PhotoRenameApp:
                     if processed_photos % 25 == 0:
                         progress_bar["value"] = processed_photos
                         progress_label.config(text=f"Processed {processed_photos} / {self.total_photos}")
-                        root.update_idletasks()
+                        self.update()
 
         time_end = time.time()
         total_time = time_end - time_start
 
         messagebox.showinfo(message=f"Photos have been renamed in {total_time:.2f} seconds")
 
-        root.destroy()
+        self.destroy()
 
     def get_num_photos(self, context):
         """When CSV is selected it will get the number of photos in the CSV depending on
@@ -298,6 +303,5 @@ class PhotoRenameApp:
         return total_photos
 
 if __name__ == "__main__":
-    root = Tk()
-    app = PhotoRenameApp(root)
-    root.mainloop()
+    app = PhotoRenameApp()
+    app.mainloop()
