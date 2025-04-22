@@ -17,16 +17,21 @@ from csv import DictReader
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 
+import sys
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS  # PyInstaller temp path
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class PhotoRenameApp(tkinter.Tk):
     def __init__(self):
         super().__init__()
         # Global variables and basic properties of the GUI
 
-        self.call("source", "azure.tcl")
-        self.call("set_theme", "dark")
-
-        self.iconbitmap(r"construction-industry-helmet-protection_108590.ico")
+        self.iconbitmap(resource_path("helmet.ico"))
         self.title("Photo Rename App")
         self.eval("tk::PlaceWindow . center")
         self.resizable(False, False)
@@ -100,7 +105,7 @@ class PhotoRenameApp(tkinter.Tk):
 
         summary = ttk.Label(self.eas_tab,
                             text="Welcome to the EAS Photo Renamer. This tab is used for renaming San Diego County assets.\n\n"
-                                 "Generate a CSV file from Access and add a `source_path` column to the CSV file.\n\n"
+                                 "Generate a CSV file from Access and click the source path where the orginal photos are stored.\n\n"
                                  "Please select the CSV file and a destination directory where the renamed photos will be stored.\n\n"
                                  "Press the help button for a more detailed walkthrough, error help, and video demo.",
                             wraplength=400,
