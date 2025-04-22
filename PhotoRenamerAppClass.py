@@ -1,3 +1,12 @@
+"""
+ Created by: Nico Saboonchi
+ File Name: Rename Script.py
+ Date: 9/6/2024
+ Function: This script will take a fulcrum CSV and rename all the downloaded photos with columns from the csv file
+           place them into a new directory.
+"""
+
+
 import os
 import csv
 import shutil
@@ -8,10 +17,12 @@ from csv import DictReader
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 
+
 class PhotoRenameApp(tkinter.Tk):
     def __init__(self):
         super().__init__()
         # Global variables and basic properties of the GUI
+
         self.call("source", "azure.tcl")
         self.call("set_theme", "dark")
 
@@ -100,14 +111,21 @@ class PhotoRenameApp(tkinter.Tk):
         self.eas_csv_label = ttk.Label(self.eas_tab, text="Open CSV File")
         self.eas_dest_label = ttk.Label(self.eas_tab, text="Open Destination Directory")
         self.eas_csv_label.grid(column=0, row=1, sticky="w", padx=5, pady=10)
-        self.eas_dest_label.grid(column=0, row=2, sticky="w", padx=5, pady=10)
+        self.eas_source_label = ttk.Label(self.eas_tab, text="Open Source Directory")
+        self.eas_dest_label.grid(column=0, row=3, sticky="w", padx=5, pady=10)
+        self.eas_source_label.grid(column=0, row=2, sticky="w", padx=5, pady=10)
 
         self.eas_csv_button = ttk.Button(self.eas_tab, text="Select CSV",
                                          command=lambda: self.get_csv(self.eas_csv_label, "EAS"))
+        self.eas_source_button = ttk.Button(self.eas_tab, text="Select Source Directory",
+                                           command=lambda: self.get_source_dir(self.eas_source_label))
+        
         self.eas_dest_button = ttk.Button(self.eas_tab, text="Select Destination Directory",
                                           command=lambda: self.get_destination_dir(self.eas_dest_label))
+        
         self.eas_csv_button.grid(column=1, row=1, sticky="e", padx=5, pady=10)
-        self.eas_dest_button.grid(column=1, row=2, sticky="e", padx=5, pady=10)
+        self.eas_source_button.grid(column=1, row=2, sticky="e", padx=5, pady=10)
+        self.eas_dest_button.grid(column=1, row=3, sticky="e", padx=5, pady=10)
 
         self.eas_run_button = ttk.Button(self.eas_tab, text="Rename Photos", command=self.run_eas_rename)
         self.eas_run_button.grid(column=1, row=4, sticky="e", padx=5, pady=10)
@@ -235,13 +253,12 @@ class PhotoRenameApp(tkinter.Tk):
 
             # iterate each row storing the info
             for row in reader:
-                source_path = row["source_path"]
                 org_name = row["org_name"]
                 new_name = row["new_name"]
                 folder = row["folder"]
 
                 # creates new paths
-                org_path = os.path.join(source_path, org_name)
+                org_path = os.path.join(self.selected_source_dir, org_name)
                 folder_dir = os.path.join(self.selected_dest_dir, folder)
                 new_img_path = os.path.join(folder_dir, new_name)
 
@@ -292,9 +309,9 @@ class PhotoRenameApp(tkinter.Tk):
                     total_photos += len(photos)
 
             elif context == "EAS":
-                required_fields = {"source_path", "org_name", "new_name", "folder"}
+                required_fields = {"org_name", "new_name", "folder"}
                 if  not required_fields.issubset(reader.fieldnames):
-                    messagebox.showerror(message="CSV missing 'source_path', 'org_name', 'new_name', 'folder'")
+                    messagebox.showerror(message="CSV missing 'org_name', 'new_name', 'folder'")
                     return
 
                 for _ in reader:
